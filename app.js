@@ -38,7 +38,7 @@ const app = {
     isRandom: false,
     isRepeat: false,
     randomIdList: [],   
-    // config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
+    config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
     
     songs: [
         {
@@ -91,10 +91,10 @@ const app = {
         },
     ], 
 
-    // setConfig: function(key, value){
-    //     this.config[key] = value;
-    //     localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.config));
-    // },
+    setConfig: function(key, value){
+        this.config[key] = value;
+        localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.config));
+    },
 
     render: function(){
         const htmls = this.songs.map((song, index) => {
@@ -174,6 +174,7 @@ const app = {
                 if(audio.duration){
                     const progressPercentage = Math.floor(audio.currentTime / audio.duration * 100);
                     progress.value = progressPercentage;
+                    _this.loadTime(audio.currentTime, audio.duration);
                 }
             }
 
@@ -211,14 +212,14 @@ const app = {
         //Xử lý khi random song
         randomBtn.onclick = function() {
             _this.isRandom = !_this.isRandom;
-            // _this.setConfig('isRandom', _this.isRandom);
+            _this.setConfig('isRandom', _this.isRandom);
             randomBtn.classList.toggle('active', _this.isRandom);
         }
 
         //Xử lý lặp lại 1 song
         repeatBtn.onclick = function() {
             _this.isRepeat = !_this.isRepeat;
-            // _this.setConfig('isRepeat', _this.isRepeat);
+            _this.setConfig('isRepeat', _this.isRepeat);
             repeatBtn.classList.toggle('active', _this.isRepeat)
         }
 
@@ -253,6 +254,35 @@ const app = {
         audio.src = this.currentSong.path;
     },
 
+    loadTime: function(currentTime, duration){
+        $('.currentAudioTime').innerHTML = this.timeCountUp(currentTime);
+        $('.totalTimeLeft').innerHTML = this.timeCountDown(currentTime, duration);
+    },
+
+    timeCountUp: function(currentTime){
+        var min = parseInt((currentTime / 60) % 60);
+        var sec = parseInt(currentTime % 60);
+        if (sec < 10) {
+            return min + ":0"+ sec;
+        }
+        else {
+            return min + ":"+ sec;
+        }
+    },
+    timeCountDown: function(currentTime, duration){
+        duration = parseInt(duration);
+        currentTime = parseInt(currentTime);
+        var timeLeft = duration - currentTime, sec, min;
+        
+        sec = timeLeft % 60;
+        min = Math.floor(timeLeft / 60) % 60;
+        
+        sec = sec < 10 ? "0" + sec : sec;
+        min = min < 10 ? "0" + min : min;
+        
+        return min + ":" + sec;
+    },
+
     loadActiveState: function(){
         const songList = $$('.song');
         songList.forEach(song => {
@@ -261,10 +291,10 @@ const app = {
         songList[this.currentIndex].classList.add('active');
     },
 
-    // loadConfig: function(){
-    //     this.isRandom = this.config.isRandom;
-    //     this.isRepeat = this.config.isRepeat;
-    // },
+    loadConfig: function(){
+        this.isRandom = this.config.isRandom;
+        this.isRepeat = this.config.isRepeat;
+    },
 
     scrollToActiveSong: function(){
         const block = this.currentIndex < 4 ? "end" : "nearest";
@@ -310,6 +340,9 @@ const app = {
     },
 
     start: function(){
+        //Gán cấu hình từ config vào ứng dụng
+        this.loadConfig();
+        
         //Định nghĩa các thuộc tính cho object
         this.defineProperties();
 
@@ -324,6 +357,11 @@ const app = {
         
         //Load trạng thái active cho song
         this.loadActiveState();
+
+        //Hiển thị trạng thái ban đầu của repeatBtn và RandomBtn
+        randomBtn.classList.toggle('active', this.isRandom);
+        repeatBtn.classList.toggle('active', this.isRepeat)
+
     }
 }
 
