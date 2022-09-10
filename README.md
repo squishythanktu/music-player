@@ -7,4 +7,4 @@ Some main features of this app:
 - Replay
 - Along with some small animation to complete this simple music player
 
-![image](https://user-images.githubusercontent.com/87054146/189205616-1dd89ba9-e315-4c21-b860-ccca00ca5061.png)
+![image](https://user-images.githubusercontent.com/87054146/189467888-adb0a421-6d0b-420b-b00e-7ab79ced06c7.png)
